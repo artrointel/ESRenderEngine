@@ -11,19 +11,18 @@
 // CPU to GPU memory-copy will be occurred per draw call (on glDrawArrays or etc)
 // and this causes bad performance on GLES 2.0.
 // hence, we should use FBO(Frame Buffer Object) after GLES 3.0.
-
-// glVertexAttribPointer(location, element_size (1~4), element_type, normalized, stride, array pointer (+offset))
 //
+// glVertexAttribPointer(location, element_size (1~4), element_type, normalized, stride, array pointer (+offset))
 // normalized = true if the vector is normalized. or use GL_FALSE
 // Vertex memory : [position, color, Texture0, Texture1] [position, color, Texture0, Texture1] ...
 // sizeof '[x,x,x,x]' is stride, sizeof(x) as offset.
+//
+// Even though we just called it on init() function which is called once by Android,
+// the memory of CPU 'vertices[]' is updated to GPU.
 
 
 #include "android/log.h"
 #include "TriangleApp.h"
-
-#define STR(s) #s
-#define TOSTR(s) STR(s)
 
 TriangleApp::TriangleApp()
 :
@@ -81,8 +80,12 @@ void TriangleApp::render()
     checkGLError("TriangleApp::render");
 }
 
-void TriangleApp::draw()
+void TriangleApp::draw() // draw call every frame
 {
+    // It seems that updating vertices only CPU side but
+    // GPU will copy the vertices.
+    vertices[0] += 0.1;
+    if(vertices[0] >= 1.f) vertices[0] = 0.f;
     // Primitive type, first index of the array, count
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }

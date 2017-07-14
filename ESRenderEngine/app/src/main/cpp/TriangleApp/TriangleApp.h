@@ -6,11 +6,12 @@
 #define GLES3JNI_TRIANGLEAPP_H
 
 #include "../RenderEngine.h"
+#include "../Common/Util.hpp"
 
 class TriangleApp : public RenderBase<TriangleApp>
 {
 public:/* Shader */
-    const GLfloat vertices[9];
+    GLfloat vertices[9];
     char const *VERTEX_SHADER;
     char const *FRAGMENT_SHADER;
 public:

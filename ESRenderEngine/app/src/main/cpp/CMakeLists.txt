@@ -46,7 +46,12 @@ add_library(
             RenderEngineJNIGlue.cpp
             RenderEngine.h
             RenderBase.cpp
-            TriangleApp/TriangleApp.cpp)
+            Common/Util.hpp
+            TriangleApp/TriangleApp.cpp
+            TriangleApp/TriangleVBOApp.cpp
+            VBOExample/StructBOApp.cpp
+            VAOExample/VAOApp.cpp
+            )
 
 
 

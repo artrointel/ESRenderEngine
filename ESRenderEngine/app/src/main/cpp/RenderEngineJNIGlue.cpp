@@ -59,6 +59,7 @@ Java_com_samsung_esrenderengine_RenderApp_resize(JNIEnv* env, jobject obj, jint 
     if (g_renderer) {
         g_renderer->resize(width, height);
     }
+    else ALOGE("RenderEngineJNIGlue, g_renderer has died on resize!");
 }
 
 JNIEXPORT void JNICALL
@@ -66,4 +67,5 @@ Java_com_samsung_esrenderengine_RenderApp_draw(JNIEnv* env, jobject obj) {
     if (g_renderer) {
         g_renderer->render();
     }
+    else ALOGE("RenderEngineJNIGlue, g_renderer has died on draw!");
 }

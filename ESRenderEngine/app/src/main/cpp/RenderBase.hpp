@@ -50,7 +50,7 @@ public:
     static T* GetInstance()
     {
         if(mInstance == NULL)
-            mInstance = new T();
+            mInstance = new T(); // Will Fix it with CRTP pattern
         return mInstance;
     }
     virtual bool init() { return false; }
