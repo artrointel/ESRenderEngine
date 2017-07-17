@@ -10,25 +10,23 @@ bool VAOApp::init()
     {   // Previous example of StructBOApp was actually using an VAO '0' as default.
 
         // Now we'll make VAO '1' and will use both of them for rendering.
+
         glGenVertexArrays(1, &vaoId);
         ALOGD("Generated VAO ID is %d", vaoId);
 
-        // new Triangle vertices of different position
-        GLfloat localVertices[9] = {
-                0.0f, 0.0f, 0.0f,
-                0.0f, 1.0f, 0.0f,
-                1.0f, 0.0f, 0.0f
-        };
         glGenBuffers(1, &newVboId);
         glBindBuffer(GL_ARRAY_BUFFER, newVboId);
         glBufferData(GL_ARRAY_BUFFER, sizeof(localVertices), &localVertices, GL_STATIC_DRAW);
         ALOGD("Generated New VBO ID is %d", newVboId);
+
+        return true;
     }
     else return false;
 }
 
 void VAOApp::render()
 {
+    ALOGD("render start");
     // Draw Left Triangle with Default VAO '0' and
     glBindVertexArray(0);
     StructBOApp::render();

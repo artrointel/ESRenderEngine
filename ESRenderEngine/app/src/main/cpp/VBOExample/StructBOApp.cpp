@@ -3,7 +3,6 @@
 //
 
 #include "StructBOApp.h"
-#include<stdio.h>
 
 bool StructBOApp::init()
 {

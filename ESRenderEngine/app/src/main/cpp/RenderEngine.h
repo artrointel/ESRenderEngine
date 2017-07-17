@@ -3,7 +3,7 @@
 //
 // Header for Rendering Engine Library.
 // include this file as a lib from your application source code.
-
+#ifndef __RENDER_ENGINE__H
 #include "RenderBase.hpp"
 
 
@@ -14,3 +14,5 @@
 #include "VAOExample/VAOApp.h"
 
 #define APP VAOApp
+
+#endif

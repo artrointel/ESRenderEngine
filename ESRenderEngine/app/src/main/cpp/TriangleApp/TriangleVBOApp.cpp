@@ -4,36 +4,6 @@
 #include<string>
 #include "TriangleVBOApp.h"
 
-TriangleVBOApp::TriangleVBOApp()
-: vertices{
-        0.0f, 0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f
-},
-#define POS_ATTRIB 0
-  indices{ 0,1,2 },
-VERTEX_SHADER(
-        "#version 300 es\n"
-        "layout(location = " TOSTR(POS_ATTRIB) ") in vec4 vPos;\n"
-        "void main() {\n"
-        "   gl_Position = vPos;\n"
-        "}\n"),
-FRAGMENT_SHADER(
-        "#version 300 es\n"
-        "precision mediump float;\n"
-        "out vec4 fragColor;\n"
-        "void main(){\n"
-        "   fragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
-        "}\n")
-{
-
-}
-
-TriangleVBOApp::~TriangleVBOApp()
-{
-
-}
-
 bool TriangleVBOApp::init()
 {
     ALOGD("TriangleVBOApp::init");
@@ -68,7 +38,8 @@ void TriangleVBOApp::draw()
     // There is no drawing code with 'vertices' which is on CPU memory.
     if(vertices[0] > 0.5f) vertices[0] = 0.0f;
     vertices[0] += 0.1f;
-    // so this experimental code never be used for drawing.
+    // so this experimental code never be used while drawing.
+    // (or, you can see the updated-screen after glBufferData(vertices) call)
     // hence, you can remove the CPU memory after init()
 
     glDrawArrays(GL_TRIANGLES, 0, 3);

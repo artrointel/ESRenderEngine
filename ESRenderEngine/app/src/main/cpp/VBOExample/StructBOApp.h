@@ -1,5 +1,6 @@
 #include "../RenderBase.hpp"
 #include "../Common/Util.hpp"
+#include "../Common/GenericSingleton.hpp"
 
 #ifndef ESRENDERENGINE_STRUCTBOAPP_H
 #define ESRENDERENGINE_STRUCTBOAPP_H
@@ -11,16 +12,17 @@
 #define VERT_IDXSIZE    3
 #define VERT_ARRSIZE    (VERT_SZ_POS+VERT_SZ_CLR)*3 // Vertex Attrib array size
 
-class StructBOApp : public RenderBase<StructBOApp>
+class StructBOApp : public RenderBase
 {
-public:
+    MAKE_SINGLETON(StructBOApp)
+protected:
     char const *VERTEX_SHADER;
     char const *FRAGMENT_SHADER;
     GLfloat vertices[VERT_ARRSIZE]; // [x,y,z,r,g,b,a]
     GLushort indices[VERT_IDXSIZE];
     GLuint mVboId[2];
 
-    StructBOApp()
+    explicit StructBOApp()
     : vertices{
         -0.5f, 0.5f, 0.0f,
          1.0f, 0.0f, 0.0f, 1.0f,
@@ -53,9 +55,8 @@ public:
     {
 
     };
-
-public:
     virtual ~StructBOApp() {}
+public:
     virtual bool init();
     virtual void render();
 private:

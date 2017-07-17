@@ -9,11 +9,22 @@
 
 class VAOApp : public StructBOApp
 {
+    MAKE_SINGLETON(VAOApp)
+protected:
+    explicit VAOApp()
+    : localVertices{
+            0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            1.0f, 0.0f, 0.0f
+    }
+    {}
+    virtual ~VAOApp() {}
+
 public:
     GLuint newVboId;
     GLuint vaoId;
+    GLfloat localVertices[9];
 public:
-    virtual ~VAOApp() {}
     virtual bool init(); // override
     virtual void render(); // override
 };
