@@ -25,9 +25,7 @@ bool TriangleVBOApp::init()
 void TriangleVBOApp::draw()
 {
     // After using buffer object codes, GL notices that the buffer object 'GL_ARRAY_BUFFER'
-
-    // so we use 0 as a location of Vertex (layout(location=0 in the v-shader))
-    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboId);
 
     // (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
     // index as a location, size of an element, pointer(which is an offset which is based on the Buffer Object)
@@ -35,12 +33,15 @@ void TriangleVBOApp::draw()
                           0, 0);
     // stride = 0 means tightly packed, so it's meaning '3*sizeof(GLfloat)' as default in this case.
 
-    // There is no drawing code with 'vertices' which is on CPU memory.
-    if(vertices[0] > 0.5f) vertices[0] = 0.0f;
-    vertices[0] += 0.1f;
+    // we use 0 as a location of Vertex (layout(location=0 in the v-shader))
+    glEnableVertexAttribArray(0);
+
+    // We did not upload this cpu-data to Buffer Object by calling glBufferData().
+    vertices[0] += 0.1;
+    if(vertices[0] >= 1.f) vertices[0] = 0.f;
     // so this experimental code never be used while drawing.
-    // (or, you can see the updated-screen after glBufferData(vertices) call)
-    // hence, you can remove the CPU memory after init()
+    // (or, you can see the updated-screen after calling glBufferData(vertices) )
+    // hence, you can remove the CPU memory after upload
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }

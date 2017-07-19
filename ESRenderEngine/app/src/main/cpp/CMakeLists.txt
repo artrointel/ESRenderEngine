@@ -51,6 +51,7 @@ add_library(
             TriangleApp/TriangleVBOApp.cpp
             VBOExample/StructBOApp.cpp
             VAOExample/VAOApp.cpp
+            MapExample/MapVertexApp.cpp
             )
 
 

@@ -8,11 +8,12 @@
 
 
 /* APP */
-#include "TriangleApp/TriangleVBOApp.h"
 #include "TriangleApp/TriangleApp.h"
+#include "TriangleApp/TriangleVBOApp.h"
 #include "VBOExample/StructBOApp.h"
 #include "VAOExample/VAOApp.h"
+#include "MapExample/MapVertexApp.h"
 
-#define APP VAOApp
+#define APP MapVertexApp
 
 #endif

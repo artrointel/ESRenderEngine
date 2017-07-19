@@ -59,8 +59,6 @@ protected:
 public:
     virtual bool init();
     virtual void render();
-private:
-    void draw();
 };
 
 #endif

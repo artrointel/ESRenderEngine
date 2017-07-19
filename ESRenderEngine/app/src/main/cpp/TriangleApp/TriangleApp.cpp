@@ -30,9 +30,9 @@ bool TriangleApp::init()
     mProgram = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
     if(!mProgram) return false;
 
-    // location, element_size (1~4), element_type, normalized, stride, array pointer (+offset))
+    // location, element_size (1~4), element_type, normalized, stride, a pointer of array(+offset))
     glVertexAttribPointer(POS_ATTRIB, 3, GL_FLOAT, GL_FALSE, 0, vertices);
-    // Enable an index of POS_ATTRIB to accessible and drawable from GPU side.
+    // Enable an location of POS_ATTRIB to accessible and drawable from GPU side.
     glEnableVertexAttribArray(POS_ATTRIB);
     return true;
 }
@@ -52,9 +52,10 @@ void TriangleApp::render()
 void TriangleApp::draw() // draw call every frame
 {
     // It seems that updating vertices only CPU side but
-    // GPU will copy the vertices.
+    // GPU will copy the vertices. (memory copy will be occurred per draw call)
     vertices[0] += 0.1;
     if(vertices[0] >= 1.f) vertices[0] = 0.f;
+
     // Primitive type, first index of the array, count
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
