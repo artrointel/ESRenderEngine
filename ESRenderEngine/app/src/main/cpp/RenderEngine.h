@@ -6,14 +6,14 @@
 #ifndef __RENDER_ENGINE__H
 #include "RenderBase.hpp"
 
-
 /* APP */
 #include "TriangleApp/TriangleApp.h"
 #include "TriangleApp/TriangleVBOApp.h"
 #include "VBOExample/StructBOApp.h"
 #include "VAOExample/VAOApp.h"
 #include "MapExample/MapVertexApp.h"
+#include "MapExample/MapFlushVertexApp.h"
 
-#define APP MapVertexApp
+#define APP MapFlushVertexApp
 
 #endif

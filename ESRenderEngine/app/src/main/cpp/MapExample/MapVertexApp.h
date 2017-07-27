@@ -32,7 +32,7 @@ protected:
         mapVertices[6] += 1.0f;
     }
 public:
-    virtual ~MapVertexApp() {}
+    virtual ~MapVertexApp() {glUnmapBuffer(GL_ARRAY_BUFFER);}
 
     virtual bool init();
     virtual void render();

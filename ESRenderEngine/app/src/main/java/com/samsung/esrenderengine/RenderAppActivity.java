@@ -9,10 +9,13 @@ public class RenderAppActivity extends Activity {
 
     RenderAppView mView;
 
+    // Rendering Overrides
     @Override protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         mView = new RenderAppView(getApplication());
         setContentView(mView);
+
+
     }
 
     @Override protected void onPause() {
@@ -23,5 +26,6 @@ public class RenderAppActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         mView.onResume();
+
     }
 }

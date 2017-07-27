@@ -9,23 +9,20 @@ bool TriangleVBOApp::init()
     ALOGD("TriangleVBOApp::init");
 
     mProgram = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
-    if(!mProgram) return false;
+    if(!mProgram)
+    {
+        ALOGD("createProgram Failed!");
+        return false;
+    }
+
 
     // Generate a buffers from GPU side and get the id of it.
     glGenBuffers(1, &mVboId);
+    // After using buffer object codes, GL notices that the buffer object 'GL_ARRAY_BUFFER'
     glBindBuffer(GL_ARRAY_BUFFER, mVboId);
 
     // GPU buffer size is initialized but there is no data yet.
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    ALOGD("TriangleVBOApp::finished");
-    return true;
-}
-
-void TriangleVBOApp::draw()
-{
-    // After using buffer object codes, GL notices that the buffer object 'GL_ARRAY_BUFFER'
-    glBindBuffer(GL_ARRAY_BUFFER, mVboId);
 
     // (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
     // index as a location, size of an element, pointer(which is an offset which is based on the Buffer Object)
@@ -35,7 +32,12 @@ void TriangleVBOApp::draw()
 
     // we use 0 as a location of Vertex (layout(location=0 in the v-shader))
     glEnableVertexAttribArray(0);
+    checkGLError("TriangleVBOApp::init");
+    return true;
+}
 
+void TriangleVBOApp::draw()
+{
     // We did not upload this cpu-data to Buffer Object by calling glBufferData().
     vertices[0] += 0.1;
     if(vertices[0] >= 1.f) vertices[0] = 0.f;

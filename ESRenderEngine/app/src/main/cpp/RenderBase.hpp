@@ -5,7 +5,6 @@
 #ifndef _RENDERBASE_H
 #define _RENDERBASE_H
 
-#include <android/log.h>
 #include <math.h>
 #include <string>
 
@@ -14,19 +13,12 @@
 #else
 #include <GLES3/gl3.h>
 #include <EGL/egl.h>
+#include <android/input.h>
+
+#include "Common/common.hpp"
+#include "Common/io/InputManager.hpp"
+
 #endif
-
-#define DEBUG 1
-
-#define LOG_TAG "RenderEngine"
-#define ALOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#define ALOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-#if DEBUG
-#define ALOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__)
-#else
-#define ALOGV(...)
-#endif
-
 
 class RenderBase {
 public:
@@ -35,11 +27,14 @@ public:
     int mWidth;
     int mHeight;
 
+    InputHandler *io;
+
     explicit RenderBase ()
     : mWidth(0), mHeight(0), mProgram(0),
-      mEGLContext(eglGetCurrentContext())
+      mEGLContext(eglGetCurrentContext()),
+      io(nullptr)
     {
-
+        io = InputManager::GetInstance();
     }
 
     virtual ~RenderBase() {
@@ -52,8 +47,11 @@ public:
         if(mEGLContext != eglGetCurrentContext())
             return;
         glDeleteProgram(mProgram);
+
     }
+    void onTouchEvent(int action, int* id, int* x, int* y, int count) { if(io) io->onTouchEvent(action, id, x, y, count); };
     void resize(int width, int height) { glViewport(0, 0, mWidth=width, mHeight=height); } // this will be fixed
+
 protected:
     static bool checkGLError(const char* funcName);
     static GLuint createShader(GLenum shaderType, const char* src);

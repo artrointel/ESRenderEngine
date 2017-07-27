@@ -47,11 +47,17 @@ add_library(
             RenderEngine.h
             RenderBase.cpp
             Common/Util.hpp
+            Common/Matrix.hpp
+            Common/Vector.hpp
+            Common/Triangle3D.hpp
+            Common/io/InputManager.hpp
+            Common/io/InputManagerDebug.hpp
             TriangleApp/TriangleApp.cpp
             TriangleApp/TriangleVBOApp.cpp
             VBOExample/StructBOApp.cpp
             VAOExample/VAOApp.cpp
             MapExample/MapVertexApp.cpp
+            MapExample/MapFlushVertexApp.cpp
             )
 
 

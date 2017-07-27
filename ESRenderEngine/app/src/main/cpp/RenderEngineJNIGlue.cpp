@@ -8,7 +8,7 @@
 // Glue codes for android native interface
 
 #include<jni.h>
-
+#include<android/input.h>
 #include "RenderEngine.h"
 
 static APP* g_renderer = NULL;
@@ -34,6 +34,8 @@ extern "C"
 JNIEXPORT void JNICALL Java_com_samsung_esrenderengine_RenderApp_init(JNIEnv* env, jobject obj);
 JNIEXPORT void JNICALL Java_com_samsung_esrenderengine_RenderApp_resize(JNIEnv* env, jobject obj, jint width, jint height);
 JNIEXPORT void JNICALL Java_com_samsung_esrenderengine_RenderApp_draw(JNIEnv* env, jobject obj);
+JNIEXPORT void JNICALL Java_com_samsung_esrenderengine_RenderApp_onTouchEvent(JNIEnv* env, jobject obj, jint action,
+                                                                              jintArray id, jintArray x, jintArray y, jint count);
 }
 
 #if !defined(DYNAMIC_ES3)
@@ -68,4 +70,15 @@ Java_com_samsung_esrenderengine_RenderApp_draw(JNIEnv* env, jobject obj) {
         g_renderer->render();
     }
     else ALOGE("RenderEngineJNIGlue, g_renderer has died on draw!");
+}
+
+JNIEXPORT void JNICALL
+Java_com_samsung_esrenderengine_RenderApp_onTouchEvent(JNIEnv* env, jobject obj, jint action, jintArray id, jintArray x, jintArray y, jint count) {
+    if (g_renderer) {
+        jint* tid = env->GetIntArrayElements(id, NULL);
+        jint* tx = env->GetIntArrayElements(x, NULL);
+        jint* ty = env->GetIntArrayElements(y, NULL);
+        g_renderer->onTouchEvent(action, tid, tx, ty, count);
+    }
+    else ALOGE("RenderEngineJNIGlue, g_renderer has died on touch event!");
 }

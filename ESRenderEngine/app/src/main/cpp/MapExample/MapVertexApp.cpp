@@ -6,16 +6,12 @@
 
 bool MapVertexApp::init()
 {
-
     if(TriangleVBOApp::init())
     {
-        glGenVertexArrays(1, &vaoMapId);
-        ALOGD("Generated VAO ID is %d", vaoMapId);
-
         // Generate an additional VBO for map example
         glGenBuffers(1, &vboMapId);
         glBindBuffer(GL_ARRAY_BUFFER, vboMapId);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(mapVertices), NULL, GL_STATIC_DRAW); // Just notify the size of array to gpu
+        glBufferData(GL_ARRAY_BUFFER, sizeof(mapVertices), NULL, GL_DYNAMIC_DRAW);
 
         // options : We will WRITE data to the mapped buffer
         mappedBuf = (GLfloat *)glMapBufferRange(GL_ARRAY_BUFFER, 0, sizeof(mapVertices),
@@ -26,7 +22,21 @@ bool MapVertexApp::init()
             return false;
         }
         memcpy(mappedBuf, mapVertices, sizeof(mapVertices));
+
+        // full-memory of 'mappedBuf' Flush operation from GPU side
+        // and release the pointer to inaccessible.
         glUnmapBuffer(GL_ARRAY_BUFFER);
+        mappedBuf = NULL;
+
+        glGenVertexArrays(1, &vaoMapId);
+        glBindVertexArray(vaoMapId);
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, vboMapId);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                                  0, 0);
+            glEnableVertexAttribArray(POS_ATTRIB);
+            ALOGD("Generated VAO ID is %d", vaoMapId);
+        }
         ALOGD("MapVertexApp Initialized");
         return true;
     }
@@ -42,15 +52,23 @@ void MapVertexApp::render()
     // draw
     glBindVertexArray(vaoMapId);
     {
-        // mapped memory will be updated with this codes and
-        // There is no copy operation about it.
-        mappedBuf[0] += 0.1f;
-        if(mappedBuf[0] >= 1.f) mappedBuf[0] = 0.f;
+        // This mapped memory(GPU-CPU shared memory) will be updated with this codes.
+        // Notice that there is no 'copy' operation.
+        mappedBuf = (GLfloat *)glMapBufferRange(GL_ARRAY_BUFFER, 0, sizeof(mapVertices),
+                                                GL_MAP_WRITE_BIT);
+        mappedBuf[0] += 0.1;
+        if(mappedBuf[0] >= 0.f) mappedBuf[0] = -1.f;
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        mappedBuf = NULL;
+        // This is not the best case because only A first of mappedBuf data [0] changes but
+        // GPU maybe update the entire of *mappedBuf data to draw even though
+        // the other data haven't ever updated.
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboMapId);
-        glEnableVertexAttribArray(POS_ATTRIB);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              0, 0);
+        // so, one of approach is that getting the only 4 bytes from the glMapBufferRange like below but
+        // mappedBuf = (GLfloat *)glMapBufferRange(GL_ARRAY_BUFFER, 0, 4,
+        //                                      GL_MAP_WRITE_BIT);
+        // This is not for General method.
+        // In most cases we should do update too many things on discrete data
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
