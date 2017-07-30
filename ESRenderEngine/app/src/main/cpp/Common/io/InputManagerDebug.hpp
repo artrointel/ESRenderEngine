@@ -33,4 +33,4 @@ public:
     }
 };
 
-#endif _INPUT_MANAGER_H
+#endif _INPUT_MANAGERDEBUG_H

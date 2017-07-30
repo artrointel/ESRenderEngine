@@ -47,17 +47,20 @@ add_library(
             RenderEngine.h
             RenderBase.cpp
             Common/Util.hpp
-            Common/Matrix.hpp
+            Common/Matrix.cpp
             Common/Vector.hpp
             Common/Triangle3D.hpp
             Common/io/InputManager.hpp
             Common/io/InputManagerDebug.hpp
+
+            ### Example of GLES apps
             TriangleApp/TriangleApp.cpp
             TriangleApp/TriangleVBOApp.cpp
             VBOExample/StructBOApp.cpp
             VAOExample/VAOApp.cpp
             MapExample/MapVertexApp.cpp
             MapExample/MapFlushVertexApp.cpp
+            Chapter_7_Primitives/InstancedPrimitivesApp.cpp
             )
 
 

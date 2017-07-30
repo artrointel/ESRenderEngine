@@ -16,7 +16,7 @@
 #include <android/input.h>
 
 #include "Common/common.hpp"
-#include "Common/io/InputManager.hpp"
+#include "Common/io/InputManagerDebug.hpp"
 
 #endif
 
@@ -34,7 +34,7 @@ public:
       mEGLContext(eglGetCurrentContext()),
       io(nullptr)
     {
-        io = InputManager::GetInstance();
+        io = InputManagerDebug::GetInstance();
     }
 
     virtual ~RenderBase() {

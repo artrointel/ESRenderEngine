@@ -39,10 +39,10 @@ protected:
               "#version 300 es\n"
               "layout(location = " TOSTR(POS_ATTR_LOC) ") in vec4 vPos;\n"
               "layout(location = " TOSTR(CLR_ATTR_LOC) ") in vec4 vColor;\n"
-              "out vec4 v_color;"
+              "out vec4 v_color;\n"
               "void main() {\n"
-              "   v_color = vColor;\n"
               "   gl_Position = vPos;\n"
+              "   v_color = vColor;\n"
               "}\n"),
       FRAGMENT_SHADER(
               "#version 300 es\n"

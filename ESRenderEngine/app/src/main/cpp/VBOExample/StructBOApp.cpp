@@ -13,7 +13,6 @@ bool StructBOApp::init()
 
     glGenBuffers(2, mVboId);
     ALOGD("Generated VBO ID is %d, %d", mVboId[0], mVboId[1]);
-    ALOGD("StructBOApp::init finished");
 
     glBindBuffer(GL_ARRAY_BUFFER, mVboId[0]); // Bind forever
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -38,7 +37,7 @@ bool StructBOApp::init()
     {
         // You'll be noticed that Indices hasn't been set because the indices are not Vertex's attribute.
     }
-
+    ALOGD("StructBOApp::init finished");
     return true;
 }
 

@@ -13,7 +13,7 @@
 #include "VAOExample/VAOApp.h"
 #include "MapExample/MapVertexApp.h"
 #include "MapExample/MapFlushVertexApp.h"
-
-#define APP MapFlushVertexApp
+#include "Chapter_7_Primitives/InstancedPrimitivesApp.h"
+#define APP InstancedPrimitivesApp
 
 #endif
