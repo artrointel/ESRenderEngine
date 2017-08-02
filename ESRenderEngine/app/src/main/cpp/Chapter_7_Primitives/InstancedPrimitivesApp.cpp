@@ -3,6 +3,7 @@
 // http://www.opengl-tutorial.org/kr/intermediate-tutorials/billboards-particles/particles-instancing/
 
 #include "InstancedPrimitivesApp.h"
+#include "../Common/io/InputManager.hpp"
 
 bool InstancedPrimitivesApp::init()
 {
@@ -27,6 +28,7 @@ bool InstancedPrimitivesApp::init()
 
     // TransformMatrix VBO; uses Difference transform vbo per Instance, because of divisor 1
     GLfloat tMat[16*2] = {0,};
+    Matrix4::SetIdentity(transformMatrix.data, 12);
     transformMatrix.fillGLArray(tMat);
     for(int i = 0; i < 4; i++)  // transformMatrix data of First Triangle.
         ALOGD("%f %f %f %f", tMat[4*i], tMat[4*i+1], tMat[4*i+2], tMat[4*i+3]  );
@@ -55,6 +57,11 @@ bool InstancedPrimitivesApp::init()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndexId);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+    // Init CamMatrix
+    io = InputManager::GetInstance();
+    InputManager::GetInstance()->init(mProgram);
+
+
     checkGLError("InstancedPrimitivesApp::init() init error");
     ALOGD("InstancedPrimitivesApp::init finished");
     return true;
@@ -69,7 +76,7 @@ void InstancedPrimitivesApp::render()
 
     // Two of identical triangles within a draw call by 'glDraw*Instanced()' but
     // divisor with transform matrix will move one of it to x->x+1
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
-    // glDrawElementsInstanced(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0, NUM_INSTANCES);
+    // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+    glDrawElementsInstanced(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0, NUM_INSTANCES);
     checkGLError("InstancedPrimitivesApp::render()");
 }

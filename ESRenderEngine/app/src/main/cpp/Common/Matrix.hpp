@@ -5,6 +5,7 @@
 #ifndef _MATRIX_H
 #define _MATRIX_H
 
+#include <string.h>
 #include "Vector.hpp"
 
 class Matrix4 // 3 by 4
@@ -25,6 +26,10 @@ public:
     // Vector multiplication only direction elements
     Vector3 transformDirection(const Vector3 &vector) const;
     Vector3 transformInverseDirection(const Vector3 &vector) const;
+
+    // Simple Operations for Translation, Scale
+    void scale(real dx, real dy, real dz);
+    void translate(real dx, real dy, real dz);
 
 public: /* Utilities */
     static inline Vector3 worldToLocal(const Vector3 &world, const Matrix4 &transform)
@@ -75,6 +80,34 @@ public: /* Utilities */
         data[7] = array[13];
         data[11] = array[14];
     }
+
+public: // GLES 3.x buffer Interfaces
+    static inline void Scale(real *glBuffer, int dx, int dy, int dz)
+    {
+        glBuffer[12] += dx;
+        glBuffer[13] += dy;
+        glBuffer[14] += dz;
+    }
+    static inline void Translate(real *glBuffer, int dx, int dy, int dz)
+    {
+        glBuffer[0] += dx;
+        glBuffer[5] += dy;
+        glBuffer[10]+= dz;
+    }
+    // Both GL buffer and Matrix4
+    static inline void SetIdentity(real *buffer, real sz)
+    {
+        if(buffer != nullptr)
+        {
+            for(int i = 0 ; i < sz; i++) buffer[i] = 0;
+            buffer[0] = 1;
+            buffer[5] = 1;
+            buffer[10] = 1;
+            if(sz >= 15)
+                buffer[15] = 1;
+        }
+    }
+
 public: /* get/set */
     //void setOrientationAndPos(const Quaternion &q, const Vector3 &pos);
     Vector3 getAxisVector(int axis) const;

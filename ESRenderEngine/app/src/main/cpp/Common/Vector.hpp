@@ -185,6 +185,16 @@ public: /* Utilities */
         b = a % c;
     }
 
+    static inline real Distance(const Vector3& a, const Vector3& b)
+    {
+        return sqrtf(SqrDistance(a,b));
+    }
+
+    // Returns Squared-Distance value for better performance
+    static inline real SqrDistance(const Vector3& a, const Vector3& b)
+    {
+        return fabs(a.x-b.x)*fabs(a.x-b.x) + fabs(a.y-b.y)*fabs(a.y-b.y) + fabs(a.z-b.z)*fabs(a.z-b.z);
+    }
 };
 
 // This nullVect will be used to check null vector.

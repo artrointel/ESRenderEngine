@@ -140,6 +140,20 @@ Vector3 Matrix4::transformInverseDirection(const Vector3 &vector) const
     );
 }
 
+void Matrix4::scale(real dx, real dy, real dz)
+{
+    data[0] += dx;
+    data[5] += dy;
+    data[10] += dz;
+}
+
+void Matrix4::translate(real dx, real dy, real dz)
+{
+    data[3] += dx;
+    data[7] += dy;
+    data[11] += dz;
+}
+
 Vector3 Matrix4::getAxisVector(int i) const // get the column value
 {
     return Vector3(data[i], data[i+4], data[i+8]);

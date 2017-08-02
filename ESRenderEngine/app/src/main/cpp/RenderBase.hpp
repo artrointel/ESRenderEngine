@@ -34,6 +34,7 @@ public:
       mEGLContext(eglGetCurrentContext()),
       io(nullptr)
     {
+        // io handler can be dynamically swapped on different apps
         io = InputManagerDebug::GetInstance();
     }
 
