@@ -13,11 +13,11 @@
 #include "../GenericSingleton.hpp"
 #include "../common.hpp"
 
-class InputManagerDebug : public InputHandler
+class InputHandlerDebug : public InputHandler
 {
-    MAKE_SINGLETON(InputManagerDebug)
+    MAKE_SINGLETON(InputHandlerDebug)
 protected:
-    InputManagerDebug()
+    InputHandlerDebug()
     {
 
     }

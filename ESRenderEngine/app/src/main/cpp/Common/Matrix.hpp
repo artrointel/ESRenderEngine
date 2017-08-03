@@ -82,18 +82,28 @@ public: /* Utilities */
     }
 
 public: // GLES 3.x buffer Interfaces
-    static inline void Scale(real *glBuffer, int dx, int dy, int dz)
-    {
-        glBuffer[12] += dx;
-        glBuffer[13] += dy;
-        glBuffer[14] += dz;
-    }
-    static inline void Translate(real *glBuffer, int dx, int dy, int dz)
+    // transpose = false if gl buffer array which is column-major matrix
+    static inline void Scale(real *glBuffer, real dx, real dy, real dz)
     {
         glBuffer[0] += dx;
         glBuffer[5] += dy;
         glBuffer[10]+= dz;
     }
+
+    static inline void Translate(real *glBuffer, real dx, real dy, real dz, bool gl_transpose = GL_FALSE)
+    {
+        if(gl_transpose)
+        {
+            glBuffer[3] += dx;
+            glBuffer[7] += dy;
+            glBuffer[11] += dz;
+            return;
+        }
+        glBuffer[12] += dx;
+        glBuffer[13] += dy;
+        glBuffer[14] += dz;
+    }
+
     // Both GL buffer and Matrix4
     static inline void SetIdentity(real *buffer, real sz)
     {

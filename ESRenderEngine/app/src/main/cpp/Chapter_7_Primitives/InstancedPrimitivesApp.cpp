@@ -3,7 +3,6 @@
 // http://www.opengl-tutorial.org/kr/intermediate-tutorials/billboards-particles/particles-instancing/
 
 #include "InstancedPrimitivesApp.h"
-#include "../Common/io/InputManager.hpp"
 
 bool InstancedPrimitivesApp::init()
 {
@@ -26,6 +25,7 @@ bool InstancedPrimitivesApp::init()
     glVertexAttribPointer(VCLR_ATTR_LOC, 4, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(VCLR_ATTR_LOC);
 
+#if INSTANCED_DRAW
     // TransformMatrix VBO; uses Difference transform vbo per Instance, because of divisor 1
     GLfloat tMat[16*2] = {0,};
     Matrix4::SetIdentity(transformMatrix.data, 12);
@@ -40,6 +40,7 @@ bool InstancedPrimitivesApp::init()
     glGenBuffers(1, &vboMatId);
     glBindBuffer(GL_ARRAY_BUFFER, vboMatId);
     glBufferData(GL_ARRAY_BUFFER, sizeof(tMat), tMat, GL_DYNAMIC_DRAW);
+
     for(int i = 0; i < 4; i++)
     {
         // Mat4 is to be assigned 4 location, which should be uploaded by vec4 type actually
@@ -51,16 +52,33 @@ bool InstancedPrimitivesApp::init()
         // finally, looping four times with a vec4 will result in a Mat4
         glVertexAttribDivisor(location, 1);
     }
+#else
+    GLfloat tMat[16] = {0,};
+    Matrix4::SetIdentity(transformMatrix.data, 12);
+    transformMatrix.fillGLArray(tMat);
+    glGenBuffers(1, &vboMatId);
+    glBindBuffer(GL_ARRAY_BUFFER, vboMatId);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tMat), tMat, GL_DYNAMIC_DRAW);
+    for(int i = 0; i < 4; i++)
+    {
+        // Mat4 is to be assigned 4 location, which should be uploaded by vec4 type actually
+        GLint location = VMAT_ATTR_LOC + i;
+        GLint offset = 4*i*sizeof(GLfloat);
+        glVertexAttribPointer(location, 4, GL_FLOAT, GL_FALSE, sizeof(tMat), (void*)offset);
+        glEnableVertexAttribArray(location);
 
+        // finally, looping four times with a vec4 will result in a Mat4
+        glVertexAttribDivisor(location, 1);
+    }
+#endif
     // Index VBO
     glGenBuffers(1, &vboIndexId);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndexId);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Init CamMatrix
-    io = InputManager::GetInstance();
-    InputManager::GetInstance()->init(mProgram);
-
+    io = InputHandlerTouchImpl::GetInstance();
+    InputHandlerTouchImpl::GetInstance()->init(mProgram);
 
     checkGLError("InstancedPrimitivesApp::init() init error");
     ALOGD("InstancedPrimitivesApp::init finished");
@@ -74,9 +92,12 @@ void InstancedPrimitivesApp::render()
             GL_DEPTH_BUFFER_BIT);
     glUseProgram(mProgram);
 
-    // Two of identical triangles within a draw call by 'glDraw*Instanced()' but
+#if INSTANCED_DRAW
+    // Drawing triangles within a draw call by 'glDraw*Instanced()' but
     // divisor with transform matrix will move one of it to x->x+1
-    // glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
     glDrawElementsInstanced(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0, NUM_INSTANCES);
+#else
+    glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_SHORT, 0);
+#endif
     checkGLError("InstancedPrimitivesApp::render()");
 }

@@ -16,7 +16,7 @@
 #include <android/input.h>
 
 #include "Common/common.hpp"
-#include "Common/io/InputManagerDebug.hpp"
+#include "Common/io/InputHandlerDebug.hpp"
 
 #endif
 
@@ -35,7 +35,7 @@ public:
       io(nullptr)
     {
         // io handler can be dynamically swapped on different apps
-        io = InputManagerDebug::GetInstance();
+        io = InputHandlerDebug::GetInstance();
     }
 
     virtual ~RenderBase() {

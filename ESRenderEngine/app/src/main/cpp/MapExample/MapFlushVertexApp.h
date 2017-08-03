@@ -9,7 +9,7 @@
 #include "../Common/GenericSingleton.hpp"
 #include "../Common/Triangle3D.hpp"
 #include "../TriangleApp/TriangleVBOApp.h"
-#include "../Common/io/InputManager.hpp"
+#include "../Common/io/InputHandlerTouchImpl.hpp"
 
 class MapFlushVertexApp : public TriangleVBOApp
 {

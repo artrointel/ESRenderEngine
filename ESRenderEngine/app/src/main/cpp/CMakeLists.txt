@@ -50,8 +50,8 @@ add_library(
             Common/Matrix.cpp
             Common/Vector.hpp
             Common/Triangle3D.hpp
-            Common/io/InputManager.hpp
-            Common/io/InputManagerDebug.hpp
+            Common/io/InputHandlerTouchImpl.hpp
+            Common/io/InputHandlerDebug.hpp
 
             ### Example of GLES apps
             TriangleApp/TriangleApp.cpp
