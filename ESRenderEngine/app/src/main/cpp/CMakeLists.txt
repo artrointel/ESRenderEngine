@@ -50,6 +50,7 @@ add_library(
             Common/Matrix.cpp
             Common/Vector.hpp
             Common/Triangle3D.hpp
+            Common/Cube3D.hpp
             Common/io/InputHandlerTouchImpl.hpp
             Common/io/InputHandlerDebug.hpp
 
@@ -61,6 +62,7 @@ add_library(
             MapExample/MapVertexApp.cpp
             MapExample/MapFlushVertexApp.cpp
             Chapter_7_Primitives/InstancedPrimitivesApp.cpp
+            Chapter_9_Textures/Texture2DApp.cpp
             )
 
 

@@ -19,12 +19,6 @@ public:
     static const int ByteSize = sizeof(real)*Size;
     // Declare Position, Color, Textures as inner union Vertex3
     union Vertex3 {
-        Vertex3()
-        {
-            for(int i = 0; i < 30; i++)
-                data[i] = 0.0f;
-        }
-        real data[3*Stride];
         struct Attrib
         {
             struct Position {
@@ -44,6 +38,13 @@ public:
                 real z;
             } texcoord;
         } vertex[3];
+        real data[3*Stride];
+
+        Vertex3()
+        {
+            for(int i = 0; i < 30; i++)
+                data[i] = 0.0f;
+        }
     };
 public:
     Vertex3 *attrib; // CPU data

@@ -11,7 +11,7 @@ bool TriangleVBOApp::init()
     mProgram = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
     if(!mProgram)
     {
-        ALOGD("createProgram Failed!");
+        ALOGE("createProgram Failed!");
         return false;
     }
 

@@ -14,6 +14,15 @@ public:
     real data[12];
 public:
     explicit Matrix4();
+    explicit Matrix4(
+            real a, real b, real c,
+            real d, real e, real f,
+            real g, real h, real i)
+    {
+        data[0] = a; data[1] = b; data[2] = c; data[3] = 0;
+        data[4] = d; data[5] = e; data[6] = f; data[7] = 0;
+        data[8] = g; data[9] = h; data[10] = i; data[11] = 0;
+    }
     real getDeterminant() const;
     void setInverse(const Matrix4 &mat);
     Matrix4 inverse() const;
@@ -102,6 +111,29 @@ public: // GLES 3.x buffer Interfaces
         glBuffer[12] += dx;
         glBuffer[13] += dy;
         glBuffer[14] += dz;
+    }
+
+    static inline void Rotate(real *glBuffer, real angle, real x, real y, real z)
+    {
+        angle = 3.141592f*angle/180.f;
+        Vector3 axis(x,y,z);
+        axis.normalize();
+        Matrix4 glMatrix;
+        glMatrix.setFromGLArray(glBuffer);
+        Matrix4 rotMat(cosf(angle) + axis.x*axis.x*(1-cosf(angle)),
+                       axis.x*axis.y*(1-cosf(angle)) - axis.z*sinf(angle),
+                       axis.x*axis.z*(1-cosf(angle)) + axis.y*sinf(angle),
+
+                       axis.y*axis.x*(1-cosf(angle)) + axis.z*sinf(angle),
+                       cosf(angle) + axis.y*axis.y*(1-cosf(angle)),
+                       axis.y*axis.z*(1-cosf(angle)) - axis.x*sinf(angle),
+
+                       axis.z*axis.x*(1-cosf(angle)) - axis.y*sinf(angle),
+                       axis.z*axis.y*(1-cosf(angle)) + axis.x*sinf(angle),
+                       cosf(angle) + axis.z*axis.z*(1-cosf(angle))
+        );
+        glMatrix = rotMat * glMatrix;
+        glMatrix.fillGLArray(glBuffer);
     }
 
     // Both GL buffer and Matrix4

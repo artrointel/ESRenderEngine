@@ -98,6 +98,10 @@ public:
         }
 
         // TODO: Include quaternion and make a rotation matrix while count is 2.
+        if(count == 2)
+        {
+            Matrix4::Rotate(glMatrix,1,1,0,0);
+        }
 
         // Scale
         if(count == 3)
