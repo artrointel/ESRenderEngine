@@ -10,6 +10,35 @@ bool Texture2DApp::init()
     if(!mProgram)
         return false;
 
+    // Axis VAO
+    glGenVertexArrays(1, &mAxisVaoId);
+    glBindVertexArray(mAxisVaoId);
+    {
+        glGenBuffers(1, &mAxisVboId);
+        glBindBuffer(GL_ARRAY_BUFFER, mAxisVboId);
+        GLfloat axis[30] = {0, 0, 0,
+                           100, 0, 0, // X-axis
+                           1, 0, 0, 1, // color of the axis
+
+                           0, 0, 0,
+                           0, 100, 0,
+                           0, 1, 0, 1,
+
+                           0, 0, 0,
+                           0, 0, 100,
+                           0, 0, 1, 1,
+        };
+        GLuint stride = sizeof(GLfloat) * 10;
+        GLuint color_offset = sizeof(GLfloat) * 6;
+        glBufferData(GL_ARRAY_BUFFER, sizeof(axis), axis, GL_STATIC_DRAW);
+        glVertexAttribPointer(VPOS_ATTR_LOC, 3, GL_FLOAT, GL_FALSE, stride, 0);
+        glVertexAttribPointer(VCLR_ATTR_LOC, 4, GL_FLOAT, GL_FALSE, stride, (void *)color_offset);
+        glEnableVertexAttribArray(VCLR_ATTR_LOC);
+        glEnableVertexAttribArray(VPOS_ATTR_LOC);
+    }
+
+    glBindVertexArray(0);
+
     // Upload Indices
     Cube3D::GetIndices(GL_TRIANGLE_FAN, mIndices);
     glGenBuffers(1, &mCubeIboId);
@@ -42,7 +71,11 @@ bool Texture2DApp::init()
 
 void Texture2DApp::draw()
 {
+    glBindVertexArray(1);
+    glDrawArrays(GL_LINES,0,6);
+    glBindVertexArray(0);
     glDrawElements(GL_TRIANGLE_FAN, 30, GL_UNSIGNED_INT, 0);
+
 }
 
 void Texture2DApp::render()

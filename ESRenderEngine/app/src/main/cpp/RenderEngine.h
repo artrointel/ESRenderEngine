@@ -15,6 +15,6 @@
 #include "MapExample/MapFlushVertexApp.h"
 #include "Chapter_7_Primitives/InstancedPrimitivesApp.h"
 #include "Chapter_9_Textures/Texture2DApp.h"
-#define APP InstancedPrimitivesApp
+#define APP Texture2DApp
 
 #endif
