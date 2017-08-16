@@ -79,6 +79,20 @@ void Matrix4::invert()
     setInverse(*this);
 }
 
+void Matrix4::setTranslation(real x, real y, real z)
+{
+    data[3] = x;
+    data[7] = y;
+    data[10] = z;
+}
+
+void Matrix4::setScale(real x, real y, real z)
+{
+    data[0] = x;
+    data[5] = y;
+    data[10] = z;
+}
+
 Vector3 Matrix4::transform(const Vector3 &vector) const
 {
     return (*this) * vector;

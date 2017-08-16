@@ -16,25 +16,31 @@ bool Texture2DApp::init()
     {
         glGenBuffers(1, &mAxisVboId);
         glBindBuffer(GL_ARRAY_BUFFER, mAxisVboId);
-        GLfloat axis[30] = {0, 0, 0,
-                           100, 0, 0, // X-axis
-                           1, 0, 0, 1, // color of the axis
+        GLfloat axis[42] = {0, 0, 0, // X
+                            1, 0, 0, 1,
 
-                           0, 0, 0,
+                           100, 0, 0,
+                            1, 0, 0, 1,
+
+                           0, 0, 0, // Y
+                            0, 1, 0, 1,
+
                            0, 100, 0,
-                           0, 1, 0, 1,
+                            0, 1, 0, 1,
 
-                           0, 0, 0,
+                           0, 0, 0, // Z
+                            0, 0, 1, 1,
+
                            0, 0, 100,
-                           0, 0, 1, 1,
+                            0, 0, 1, 1
         };
-        GLuint stride = sizeof(GLfloat) * 10;
-        GLuint color_offset = sizeof(GLfloat) * 6;
+        GLuint stride = sizeof(GLfloat) * 7;
+        GLuint color_offset = sizeof(GLfloat) * 3;
         glBufferData(GL_ARRAY_BUFFER, sizeof(axis), axis, GL_STATIC_DRAW);
         glVertexAttribPointer(VPOS_ATTR_LOC, 3, GL_FLOAT, GL_FALSE, stride, 0);
         glVertexAttribPointer(VCLR_ATTR_LOC, 4, GL_FLOAT, GL_FALSE, stride, (void *)color_offset);
-        glEnableVertexAttribArray(VCLR_ATTR_LOC);
         glEnableVertexAttribArray(VPOS_ATTR_LOC);
+        glEnableVertexAttribArray(VCLR_ATTR_LOC);
     }
 
     glBindVertexArray(0);
@@ -50,7 +56,9 @@ bool Texture2DApp::init()
     glBindBuffer(GL_ARRAY_BUFFER, mCubeVboId);
     glBufferData(GL_ARRAY_BUFFER, cube3D.ByteSize, cube3D.attrib, GL_STATIC_DRAW);
     glVertexAttribPointer(VPOS_ATTR_LOC, 3, GL_FLOAT, GL_FALSE, Cube3D::ByteStride, 0);
+    glVertexAttribPointer(VCLR_ATTR_LOC, 4, GL_FLOAT, GL_FALSE, Cube3D::ByteStride, (void*)Cube3D::ByteOffsetPos);
     glEnableVertexAttribArray(VPOS_ATTR_LOC);
+    glEnableVertexAttribArray(VCLR_ATTR_LOC);
 
     // Upload Textures
 /*
@@ -64,18 +72,20 @@ bool Texture2DApp::init()
     // Init CamMatrix
     io = InputHandlerTouchImpl::GetInstance();
     InputHandlerTouchImpl::GetInstance()->init(mProgram);
-
+    //io = InputHandlerDebug::GetInstance();
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glEnable(GL_DEPTH_TEST);
     checkGLError("Texture2DApp::init");
     return true;
 }
 
 void Texture2DApp::draw()
 {
-    glBindVertexArray(1);
+    glBindVertexArray(mAxisVaoId);
     glDrawArrays(GL_LINES,0,6);
     glBindVertexArray(0);
-    glDrawElements(GL_TRIANGLE_FAN, 30, GL_UNSIGNED_INT, 0);
-
+    glDrawElements(GL_TRIANGLE_STRIP, sizeof(mIndices)/sizeof(GLfloat), GL_UNSIGNED_INT, 0);
 }
 
 void Texture2DApp::render()

@@ -20,7 +20,7 @@ public:
     GLuint mCubeVboId;
     GLuint mCubeToId;
     GLuint mCubeIboId;
-    GLuint mIndices[30];
+    GLuint mIndices[69];
     Cube3D cube3D;
     GLubyte texture[4*3];
 
@@ -61,7 +61,7 @@ protected:
               "     fragColor = v_color;\n"
               "}\n")
     {
-
+        cube3D.setDefaultColor();
     }
     virtual ~Texture2DApp() {}
 public:

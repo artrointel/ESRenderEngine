@@ -32,6 +32,7 @@ protected:
     GLfloat glMatrix[16];
     int prev_x;
     int prev_y;
+    int prev_touch_count;
     bool active;
 
     InputHandlerTouchImpl()
@@ -76,6 +77,18 @@ public:
     {
         if(!active) return false;
 
+        /* Remove dirty input */
+        // Reset prev touch count to 0 when fingers are removed from the screen panel.
+        if( action == AMOTION_EVENT_ACTION_UP)
+        {
+            prev_touch_count = 0;
+            return false;
+        }
+        // Remove dirty input by detach fingers from the screen panel.
+        if( count < prev_touch_count)
+            return false;
+        prev_touch_count = count;
+
         // Translation
         if(count == 1)
         {
@@ -100,7 +113,19 @@ public:
         // TODO: Include quaternion and make a rotation matrix while count is 2.
         if(count == 2)
         {
-            Matrix4::Rotate(glMatrix,1,1,0,0);
+            if(action == AMOTION_EVENT_ACTION_MOVE)
+            {
+                int scaled[3];
+                for(int i = 0; i < 3; i++)
+                {
+                    scaled[i] = glMatrix[12+i];
+                    glMatrix[12+i] = 0;
+                }
+                Matrix4::Rotate(glMatrix,5,1,0,0);
+
+                for(int i = 0; i < 3; i++)
+                    glMatrix[12+i] = scaled[i];
+            }
         }
 
         // Scale

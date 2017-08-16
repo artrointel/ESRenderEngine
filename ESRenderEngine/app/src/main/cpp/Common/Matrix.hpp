@@ -27,6 +27,8 @@ public:
     void setInverse(const Matrix4 &mat);
     Matrix4 inverse() const;
     void invert();
+    void setTranslation(real x, real y, real z);
+    void setScale(real x, real y, real z);
 
     // Vector multiplication of transform
     Vector3 transform(const Vector3 &vector) const;
@@ -113,13 +115,10 @@ public: // GLES 3.x buffer Interfaces
         glBuffer[14] += dz;
     }
 
-    static inline void Rotate(real *glBuffer, real angle, real x, real y, real z)
+    static inline Matrix4 GetRotationMatrix(real angle, real x, real y, real z)
     {
         angle = 3.141592f*angle/180.f;
         Vector3 axis(x,y,z);
-        axis.normalize();
-        Matrix4 glMatrix;
-        glMatrix.setFromGLArray(glBuffer);
         Matrix4 rotMat(cosf(angle) + axis.x*axis.x*(1-cosf(angle)),
                        axis.x*axis.y*(1-cosf(angle)) - axis.z*sinf(angle),
                        axis.x*axis.z*(1-cosf(angle)) + axis.y*sinf(angle),
@@ -132,7 +131,17 @@ public: // GLES 3.x buffer Interfaces
                        axis.z*axis.y*(1-cosf(angle)) + axis.x*sinf(angle),
                        cosf(angle) + axis.z*axis.z*(1-cosf(angle))
         );
-        glMatrix = rotMat * glMatrix;
+        return rotMat;
+    }
+
+    static inline void Rotate(real *glBuffer, real angle, real x, real y, real z)
+    {
+        angle = 3.141592f*angle/180.f;
+        Vector3 axis(x,y,z);
+        axis.normalize();
+        Matrix4 glMatrix;
+        glMatrix.setFromGLArray(glBuffer);
+        glMatrix = GetRotationMatrix(angle, x, y, z) * glMatrix;
         glMatrix.fillGLArray(glBuffer);
     }
 
