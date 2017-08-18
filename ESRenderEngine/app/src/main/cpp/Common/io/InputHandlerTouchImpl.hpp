@@ -14,6 +14,8 @@
 #include "../GenericSingleton.hpp"
 #include "../common.hpp"
 #include "../Matrix.hpp"
+#include "../quaternion.h"
+
 static const char* TAG = "InputHandlerTouchImpl";
 
 // Find cameraMatrix from vshader and connect it.
@@ -27,11 +29,12 @@ public:
     GLuint refProgram;
     GLfloat coeff;
 protected:
-    //static const char* TAG;
-    Matrix4 camMatrix; // note that it has only 12 elements.
-    GLfloat glMatrix[16];
+    Quaternion orientation;
+    Matrix4 rotationMatrix;
+    GLfloat transformMatrix[16]; // transform & scaler matrix.
     int prev_x;
     int prev_y;
+    real prev_sum = -1;
     int prev_touch_count;
     bool active;
 
@@ -65,9 +68,15 @@ public:
             ALOGW("%s, Couldn't find uniform mat4 camMatrix on program %d.", TAG, refProgram);
             return;
         }
-        Matrix4::SetIdentity(camMatrix.data, 12); // Identity
-        camMatrix.fillGLArray(glMatrix);
-        glUniformMatrix4fv(INDX_ATTR_CAM, 1, GL_FALSE, glMatrix);
+        Matrix4 identity;
+        Matrix4::SetIdentity(identity.data, 12); // Identity
+        identity.fillGLArray(transformMatrix);
+        ALOGD(TAG,"init matrix");
+        for(int i = 0; i < 16; i++)
+            if(i%4==0)
+                ALOGD("%f %f %f %f", transformMatrix[i], transformMatrix[i+1], transformMatrix[i+2], transformMatrix[i+3]);
+
+        glUniformMatrix4fv(INDX_ATTR_CAM, 1, GL_FALSE, transformMatrix);
 
         ALOGD("%s, Initialized.", TAG);
         active = true;
@@ -78,10 +87,16 @@ public:
         if(!active) return false;
 
         /* Remove dirty input */
-        // Reset prev touch count to 0 when fingers are removed from the screen panel.
-        if( action == AMOTION_EVENT_ACTION_UP)
+        // Initialize touch data
+        if( action == AMOTION_EVENT_ACTION_UP || action > AMOTION_EVENT_ACTION_MOVE)
         {
-            prev_touch_count = 0;
+            // Reset prev touch count to 0 when fingers are removed from the screen panel.
+            if(action == AMOTION_EVENT_ACTION_UP)
+                prev_touch_count = 0;
+            // Remove prev data
+            prev_x = -1;
+            prev_y = -1;
+            prev_sum = -1;
             return false;
         }
         // Remove dirty input by detach fingers from the screen panel.
@@ -96,42 +111,50 @@ public:
             {
                 if(prev_x == -1)
                 {
-                    prev_x = x[0]; prev_y = y[0];
+                    prev_x = x[0];
+                    prev_y = y[0];
                 }
                 // Set (-x,y,0) because of camera uses inverse of x translation
-                Matrix4::Translate(glMatrix, -(GLfloat)coeff*(prev_x-x[0]), (GLfloat)coeff*(prev_y-y[0]), 0);
+                Matrix4::Translate(transformMatrix, -(GLfloat)coeff*(prev_x-x[0]), (GLfloat)coeff*(prev_y-y[0]), 0);
                 prev_x = x[0];
                 prev_y = y[0];
             }
-            else // Initialize prev data
-            {
-                prev_x = -1;
-                prev_y = -1;
-            }
         }
 
-        // TODO: Include quaternion and make a rotation matrix while count is 2.
         if(count == 2)
         {
             if(action == AMOTION_EVENT_ACTION_MOVE)
             {
-                int scaled[3];
-                for(int i = 0; i < 3; i++)
-                {
-                    scaled[i] = glMatrix[12+i];
-                    glMatrix[12+i] = 0;
-                }
-                Matrix4::Rotate(glMatrix,5,1,0,0);
+                GLfloat mx = (x[0]+x[1])/2;
+                GLfloat my = (y[0]+y[1])/2;
 
-                for(int i = 0; i < 3; i++)
-                    glMatrix[12+i] = scaled[i];
+                if(prev_x == -1)
+                {
+                    prev_x = mx;
+                    prev_y = my;
+                }
+
+                Vector3 jesture_direction(mx-prev_x, my-prev_y,0);
+                if(!Util::IsZero(jesture_direction.squareMagnitude()))
+                {
+                    Vector3 z_dir(0,0,1);
+                    Vector3 normal = z_dir % jesture_direction;
+                    GLfloat angle = coeff * normal.squareMagnitude();
+
+                    orientation.rotateByAngleAxis(angle, normal);
+                    GetTransformMatrix(rotationMatrix, Vector3(0,0,0), orientation);
+
+                    prev_x = mx;
+                    prev_y = my;
+
+                    // Update tramsformMatrix
+                }
             }
         }
 
         // Scale
         if(count == 3)
         {
-            static real prev_sum = -1;
             if(action == AMOTION_EVENT_ACTION_MOVE)
             {
                 Vector3 a[3];
@@ -148,12 +171,41 @@ public:
                 if(prev_sum == -1) prev_sum = sum;
 
                 real scaler = (prev_sum - sum);
-                Matrix4::Scale(glMatrix, -scaler, -scaler, 0);
+                Matrix4::Scale(transformMatrix, -scaler, -scaler, -scaler);
                 prev_sum = sum;
-            } else prev_sum = -1;
+            }
         }
-        glUniformMatrix4fv(INDX_ATTR_CAM, 1, GL_FALSE, glMatrix);
+        glUniformMatrix4fv(INDX_ATTR_CAM, 1, GL_FALSE, transformMatrix);
         return false;
+    }
+
+    static inline void GetTransformMatrix(Matrix4 &transformMatrix,
+                                          const Vector3 &position,
+                                          const Quaternion &orientation)
+    {
+        transformMatrix.data[0] = 1-2*orientation.j*orientation.j -
+                                  2*orientation.k*orientation.k;
+        transformMatrix.data[1] = 2*orientation.i*orientation.j -
+                                  2*orientation.r*orientation.k;
+        transformMatrix.data[2] = 2*orientation.i*orientation.k +
+                                  2*orientation.r*orientation.j;
+        transformMatrix.data[3] = position.x;
+
+        transformMatrix.data[4] = 2*orientation.i*orientation.j +
+                                  2*orientation.r*orientation.k;
+        transformMatrix.data[5] = 1-2*orientation.i*orientation.i -
+                                  2*orientation.k*orientation.k;
+        transformMatrix.data[6] = 2*orientation.j*orientation.k -
+                                  2*orientation.r*orientation.i;
+        transformMatrix.data[7] = position.y;
+
+        transformMatrix.data[8] = 2*orientation.i*orientation.k -
+                                  2*orientation.r*orientation.j;
+        transformMatrix.data[9] = 2*orientation.j*orientation.k +
+                                  2*orientation.r*orientation.i;
+        transformMatrix.data[10] = 1-2*orientation.i*orientation.i -
+                                   2*orientation.j*orientation.j;
+        transformMatrix.data[11] = position.z;
     }
 };
 

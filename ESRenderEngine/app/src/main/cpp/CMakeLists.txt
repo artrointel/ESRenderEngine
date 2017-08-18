@@ -49,6 +49,7 @@ add_library(
             Common/Util.hpp
             Common/Matrix.cpp
             Common/Vector.hpp
+            Common/quaternion.h
             Common/Triangle3D.hpp
             Common/Cube3D.hpp
             Common/io/InputHandlerTouchImpl.hpp

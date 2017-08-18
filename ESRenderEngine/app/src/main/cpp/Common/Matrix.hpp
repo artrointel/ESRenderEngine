@@ -134,15 +134,16 @@ public: // GLES 3.x buffer Interfaces
         return rotMat;
     }
 
-    static inline void Rotate(real *glBuffer, real angle, real x, real y, real z)
+    static inline void SetRotation(real *glBuffer, real angle, real x, real y, real z)
     {
         angle = 3.141592f*angle/180.f;
         Vector3 axis(x,y,z);
         axis.normalize();
         Matrix4 glMatrix;
+        Matrix4 rotMatrix = GetRotationMatrix(angle, x, y, z);
         glMatrix.setFromGLArray(glBuffer);
-        glMatrix = GetRotationMatrix(angle, x, y, z) * glMatrix;
-        glMatrix.fillGLArray(glBuffer);
+        Matrix4 result = rotMatrix * glMatrix;
+        result.fillGLArray(glBuffer);
     }
 
     // Both GL buffer and Matrix4
