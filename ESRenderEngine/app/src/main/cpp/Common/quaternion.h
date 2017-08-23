@@ -32,6 +32,12 @@ public:
 	explicit Quaternion(real _r, real _i, real _j, real _k)
 		:
 		r(_r), i(_i), j(_j), k(_k) {}
+	inline void initialize()
+	{
+		r = 1.f;
+		i = j = k = 0.f;
+	}
+
 	inline void normalize()
 	{
 		real d = r*r + i*i + j*j + k*k;

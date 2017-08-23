@@ -30,7 +30,7 @@ public:
     GLfloat coeff;
 protected:
     Quaternion orientation;
-    Matrix4 rotationMatrix;
+    Matrix4 matrices[3]; // S,R,T
     GLfloat transformMatrix[16]; // transform & scaler matrix.
     int prev_x;
     int prev_y;
@@ -69,13 +69,7 @@ public:
             return;
         }
         Matrix4 identity;
-        Matrix4::SetIdentity(identity.data, 12); // Identity
-        identity.fillGLArray(transformMatrix);
-        ALOGD(TAG,"init matrix");
-        for(int i = 0; i < 16; i++)
-            if(i%4==0)
-                ALOGD("%f %f %f %f", transformMatrix[i], transformMatrix[i+1], transformMatrix[i+2], transformMatrix[i+3]);
-
+        Matrix4::Identity().fillGLArray(transformMatrix);
         glUniformMatrix4fv(INDX_ATTR_CAM, 1, GL_FALSE, transformMatrix);
 
         ALOGD("%s, Initialized.", TAG);
@@ -104,7 +98,7 @@ public:
             return false;
         prev_touch_count = count;
 
-        // Translation
+        // TRS
         if(count == 1)
         {
             if(action == AMOTION_EVENT_ACTION_MOVE)
@@ -115,7 +109,7 @@ public:
                     prev_y = y[0];
                 }
                 // Set (-x,y,0) because of camera uses inverse of x translation
-                Matrix4::Translate(transformMatrix, -(GLfloat)coeff*(prev_x-x[0]), (GLfloat)coeff*(prev_y-y[0]), 0);
+                matrices[0].translate(-(GLfloat)coeff*(prev_x-x[0]), (GLfloat)coeff*(prev_y-y[0]), 0);
                 prev_x = x[0];
                 prev_y = y[0];
             }
@@ -134,7 +128,7 @@ public:
                     prev_y = my;
                 }
 
-                Vector3 jesture_direction(mx-prev_x, my-prev_y,0);
+                Vector3 jesture_direction(mx-prev_x, -(my-prev_y),0); // inverse of y value.
                 if(!Util::IsZero(jesture_direction.squareMagnitude()))
                 {
                     Vector3 z_dir(0,0,1);
@@ -142,12 +136,10 @@ public:
                     GLfloat angle = coeff * normal.squareMagnitude();
 
                     orientation.rotateByAngleAxis(angle, normal);
-                    GetTransformMatrix(rotationMatrix, Vector3(0,0,0), orientation);
+                    GetTransformMatrix(matrices[1], Vector3(0,0,0), orientation);
 
                     prev_x = mx;
                     prev_y = my;
-
-                    // Update tramsformMatrix
                 }
             }
         }
@@ -171,10 +163,20 @@ public:
                 if(prev_sum == -1) prev_sum = sum;
 
                 real scaler = (prev_sum - sum);
-                Matrix4::Scale(transformMatrix, -scaler, -scaler, -scaler);
+                matrices[2].scale(-scaler, -scaler, -scaler);
                 prev_sum = sum;
             }
         }
+
+        // Initialize transform
+        if(count == 4)
+        {
+            for(int i = 0; i < 3; i++)
+                matrices[i] = Matrix4::Identity();
+            orientation.initialize();
+        }
+        Matrix4 trans = matrices[0] * matrices[1] * matrices[2];
+        trans.fillGLArray(transformMatrix);
         glUniformMatrix4fv(INDX_ATTR_CAM, 1, GL_FALSE, transformMatrix);
         return false;
     }

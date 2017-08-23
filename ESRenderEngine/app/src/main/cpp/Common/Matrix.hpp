@@ -91,7 +91,11 @@ public: /* Utilities */
         data[7] = array[13];
         data[11] = array[14];
     }
-
+    static Matrix4 Identity()
+    {
+        static Matrix4 ret;
+        return ret;
+    }
 public: // GLES 3.x buffer Interfaces
     // transpose = false if gl buffer array which is column-major matrix
     static inline void Scale(real *glBuffer, real dx, real dy, real dz)
