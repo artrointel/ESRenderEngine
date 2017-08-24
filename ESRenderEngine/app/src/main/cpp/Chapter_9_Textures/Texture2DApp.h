@@ -34,10 +34,6 @@ protected:
 #define VCAM_ATTR_LOC 3
     Texture2DApp()
     : cube3D(0.2, 0.2, 0.2),
-      texture{255, 0, 0,
-              0, 255, 0,
-              0, 0, 255,
-              255, 255, 0},
       VERTEX_SHADER(
             "#version 300 es\n"
             "layout(location = " TOSTR(VPOS_ATTR_LOC) ") in vec4 vPos;\n"
@@ -62,12 +58,14 @@ protected:
               "}\n")
     {
         cube3D.setDefaultColor();
+
     }
     virtual ~Texture2DApp() {}
 public:
     virtual bool init();
     virtual void render();
 private:
+    void _generate_box_filtering_mipmapEven(GLubyte *texture, GLuint width, GLuint height, GLuint level);
     void draw();
 };
 

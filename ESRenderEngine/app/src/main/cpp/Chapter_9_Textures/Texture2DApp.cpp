@@ -61,14 +61,28 @@ bool Texture2DApp::init()
     glEnableVertexAttribArray(VCLR_ATTR_LOC);
 
     // Upload Textures
-/*
+    texture = {
+            255, 0, 0,
+            0, 255, 0,
+            0, 0, 255,
+            255, 255, 0};
+    // set the pixel row of alignment, default value is 4 which means that word-sized-memory.
+    // but we're setting it to 1 which means that tightly-packed-memory.
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    // make Texture object
     glGenTextures(1, &mCubeToId);
     glBindTexture(GL_TEXTURE_2D, mCubeToId);
+    // Upload texture data by using glTexImageXX.
+    // Now we're just uploading a simple texture 2x2 like this. one of the 0 value in ...2,2,0...is dummy for consistency of API.
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // Generate mipmap example but actually we don't have to use it.
+    _generate_box_filtering_mipmapEven(texture, 2, 2, 0);
+    // Generate mipmap from GL.
+    glGenerateMipmap(GL_TEXTURE_2D);
+    // Set Filtering modes when MIN/MAX. when mipmapping gets fault, gpu should refer these filter options.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // (nearest sampling but it causes bad artifacts like aliasing.)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-*/
+
     // Init CamMatrix
     io = InputHandlerTouchImpl::GetInstance();
     InputHandlerTouchImpl::GetInstance()->init(mProgram);
@@ -78,6 +92,46 @@ bool Texture2DApp::init()
     glEnable(GL_DEPTH_TEST);
     checkGLError("Texture2DApp::init");
     return true;
+}
+
+// Suppose that width and height is even number. or, mipmap data will ignore the edge texture pixels.
+// But this mechanism is already implemented on GPU-side, that is glGenerateMipmap()
+// 1. since drawing with texture data requires cache memory from GPU side, mipmapping gets better performance in general.
+// 2. also, since texture filtering mechanism requires some hw cost, using by mipmapped-texture gets better performance in general.
+void Texture2DApp::_generate_box_filtering_mipmapEven(GLubyte *texture, GLuint width, GLuint height, GLuint level)
+{
+    if(width < 2 || height < 2)
+        return;
+
+    GLubyte *prevImage = texture;
+
+    int newWidth = width/2;
+    int newHeight = height/2;
+    GLubyte *newTexture = new GLubyte[newHeight*newWidth];
+    for(int h = 0; h < newHeight; h++)
+    {
+        int row = width*2*h;
+        int next_row = width*(2*h+1);
+        for(int w = 0; w < newWidth; w++)
+        {
+            // 2x2 to a pixel.
+            GLubyte pixel = ((int)texture[2*w + row] + (int)texture[2*w+1 + row] +
+                            (int)texture[2*w + next_row] + (int)texture[2*w+1 + next_row])*0.25f;
+
+            newTexture[w + width*h] = pixel;
+        }
+    }
+
+    // Finally Upload generated new texture as mipmap recursively.
+    glTexImage2D(GL_TEXTURE_2D, level, GL_RGB,
+                newWidth,newHeight, 0, GL_RGB,
+                GL_UNSIGNED_BYTE, newTexture);
+
+    _generate_box_filtering_mipmapEven(newTexture, newWidth, newHeight, ++level);
+
+    // Delete all data of mipmap texture which has been already copied to the GPU.
+    delete[] newTexture;
+    newTexture = nullptr;
 }
 
 void Texture2DApp::draw()

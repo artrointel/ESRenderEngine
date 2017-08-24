@@ -45,7 +45,7 @@ public:
                 real x;
                 real y;
                 real z;
-            } texture;
+            } *texture;
         } vertex[8];
         real data[8*Stride];
 
@@ -68,14 +68,14 @@ public:
 
     void setDefaultColor()
     {
-        attrib->vertex[0].color = Vertex3::Attrib::Color(1,0,0, 0.7);
-        attrib->vertex[1].color = Vertex3::Attrib::Color(0,1,0, 0.7);
-        attrib->vertex[2].color = Vertex3::Attrib::Color(0,0,1, 0.7);
-        attrib->vertex[3].color = Vertex3::Attrib::Color(1,1,0, 0.7);
-        attrib->vertex[4].color = Vertex3::Attrib::Color(0,1,1, 0.7);
-        attrib->vertex[5].color = Vertex3::Attrib::Color(1,0,1, 0.7);
-        attrib->vertex[6].color = Vertex3::Attrib::Color(0,0,0, 0.7);
-        attrib->vertex[7].color = Vertex3::Attrib::Color(1,1,1, 0.7); // 7, 0, 1
+        attrib->vertex[0].color = Vertex3::Attrib::Color(1,0,0, 0.4);
+        attrib->vertex[1].color = Vertex3::Attrib::Color(0,1,0, 0.4);
+        attrib->vertex[2].color = Vertex3::Attrib::Color(0,0,1, 0.4);
+        attrib->vertex[3].color = Vertex3::Attrib::Color(1,1,0, 0.4);
+        attrib->vertex[4].color = Vertex3::Attrib::Color(0,1,1, 0.4);
+        attrib->vertex[5].color = Vertex3::Attrib::Color(1,0,1, 0.4);
+        attrib->vertex[6].color = Vertex3::Attrib::Color(0,0,0, 0.4);
+        attrib->vertex[7].color = Vertex3::Attrib::Color(1,1,1, 0.4); // 7, 0, 1
     }
 
     void setVertexPosition()
@@ -123,7 +123,7 @@ public:
                 return;
             }
 
-            int fan[69] = {0, 1, 2, 2, 2, 0,
+            int strip[69] = {0, 1, 2, 2, 2, 0,
                            0, 2, 3, 3, 3, 0,
                            0, 3, 4, 4, 4, 0,
                            0, 4, 5, 5, 5, 0,
@@ -137,7 +137,7 @@ public:
                            7, 1, 6
             };
             for(int i = 0; i < 69; i++)
-                out_indices[i] = fan[i];
+                out_indices[i] = strip[i];
         }
     }
 
