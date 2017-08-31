@@ -61,27 +61,37 @@ bool Texture2DApp::init()
     glEnableVertexAttribArray(VCLR_ATTR_LOC);
 
     // Upload Textures
-    texture = {
-            255, 0, 0,
-            0, 255, 0,
-            0, 0, 255,
-            255, 255, 0};
     // set the pixel row of alignment, default value is 4 which means that word-sized-memory.
     // but we're setting it to 1 which means that tightly-packed-memory.
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    // make Texture object
+    // 1. make Texture object
     glGenTextures(1, &mCubeToId);
     glBindTexture(GL_TEXTURE_2D, mCubeToId);
-    // Upload texture data by using glTexImageXX.
+    // 2. Upload texture data by using glTexImageXX.
     // Now we're just uploading a simple texture 2x2 like this. one of the 0 value in ...2,2,0...is dummy for consistency of API.
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
-    // Generate mipmap example but actually we don't have to use it.
+    // 'texture' which is last parameter of glTexImage2D will be replaced by offset of the Pixel Buffer Object.
+    // as the glVertexAttribPointer() does.
+
+    // 3. Generate mipmap example but actually we don't have to use it.
     _generate_box_filtering_mipmapEven(texture, 2, 2, 0);
-    // Generate mipmap from GL.
+    // or, Generate mipmap from GL API.
     glGenerateMipmap(GL_TEXTURE_2D);
-    // Set Filtering modes when MIN/MAX. when mipmapping gets fault, gpu should refer these filter options.
+    // 4. Set Filtering Modes when MIN/MAX. when mipmapping gets fault, gpu should refer these filter options.
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // (nearest sampling but it causes bad artifacts like aliasing.)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // but actually, we'll not using the glTexParameter() to set the same settings for every textures (that is sampler)
+
+    // 5. Set Texture Wrapping Modes
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // recursive width  texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); // recursive height texture
+
+
+    glActiveTexture(GL_TEXTURE0);
+    GLuint samplerLoc = glGetUniformLocation(mProgram, "s_texture");
+    // actually gles uses sampler = 0 as default sampler.
+    // it means that the current of texture object settings will be used, not the sampler object.
+    glUniform1i(samplerLoc, 0);
 
     // Init CamMatrix
     io = InputHandlerTouchImpl::GetInstance();

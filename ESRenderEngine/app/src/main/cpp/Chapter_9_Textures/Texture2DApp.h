@@ -34,7 +34,12 @@ protected:
 #define VCAM_ATTR_LOC 3
     Texture2DApp()
     : cube3D(0.2, 0.2, 0.2),
-      VERTEX_SHADER(
+      texture {
+              255, 0, 0,
+              0, 255, 0,
+              0, 0, 255,
+              255, 255, 0},
+    VERTEX_SHADER(
             "#version 300 es\n"
             "layout(location = " TOSTR(VPOS_ATTR_LOC) ") in vec4 vPos;\n"
             "layout(location = " TOSTR(VCLR_ATTR_LOC) ") in vec4 vColor;\n"
@@ -52,13 +57,13 @@ protected:
               "precision mediump float;\n"
               "in vec4 v_color;\n"
               "in vec2 v_texCoord;\n"
+              "uniform sampler2D s_texture;\n"
               "out vec4 fragColor;\n"
               "void main() {\n"
-              "     fragColor = v_color;\n"
+              "     fragColor = texture(s_texture, v_texCoord);\n"
               "}\n")
     {
         cube3D.setDefaultColor();
-
     }
     virtual ~Texture2DApp() {}
 public:
