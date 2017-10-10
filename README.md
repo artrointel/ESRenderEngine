@@ -1,2 +1,2 @@
 # ESRenderEngine
-Simple GL Rendering Engine on Android GLES3. There're some Tutorial rendering apps for GLES3.0
+This project is a bundle of examples of GLES 3.0 rendering for Android Native.
